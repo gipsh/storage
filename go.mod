@@ -1,3 +1,3 @@
-module github.com/gofiber/storage
+module github.com/gipsh/storage
 
 go 1.18
