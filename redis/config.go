@@ -77,6 +77,9 @@ type Config struct {
 	//
 	// Optional. Default is 10 connections per every available CPU as reported by runtime.GOMAXPROCS.
 	PoolSize int
+
+	// Prefix to use for the collection
+	Prefix string
 }
 
 // ConfigDefault is the default config
@@ -95,6 +98,7 @@ var ConfigDefault = Config{
 	ClientName:       "",
 	SentinelUsername: "",
 	SentinelPassword: "",
+	Prefix:           "",
 }
 
 // Helper function to set default values

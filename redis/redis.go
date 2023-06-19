@@ -10,11 +10,12 @@ import (
 
 // Storage interface that is implemented by storage providers
 type Storage struct {
-	db redis.UniversalClient
+	db     redis.UniversalClient
+	prefix string
 }
 
 // New creates a new redis storage
-func New(config ...Config) *Storage {
+func New(config ...Config) (*Storage, error) {
 	// Set default config
 	cfg := configDefault(config...)
 
@@ -25,7 +26,7 @@ func New(config ...Config) *Storage {
 	if cfg.URL != "" {
 		options, err := redis.ParseURL(cfg.URL)
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 
 		// Update the config values with the parsed URL values
@@ -53,20 +54,20 @@ func New(config ...Config) *Storage {
 
 	// Test connection
 	if err := db.Ping(context.Background()).Err(); err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	// Empty collection if Clear is true
 	if cfg.Reset {
 		if err := db.FlushDB(context.Background()).Err(); err != nil {
-			panic(err)
+			return nil, err
 		}
 	}
 
 	// Create new store
 	return &Storage{
 		db: db,
-	}
+	}, nil
 }
 
 // ...
@@ -76,7 +77,7 @@ func (s *Storage) Get(key string) ([]byte, error) {
 	if len(key) <= 0 {
 		return nil, nil
 	}
-	val, err := s.db.Get(context.Background(), key).Bytes()
+	val, err := s.db.Get(context.Background(), s.composeKey(key)).Bytes()
 	if err == redis.Nil {
 		return nil, nil
 	}
@@ -88,7 +89,7 @@ func (s *Storage) Set(key string, val []byte, exp time.Duration) error {
 	if len(key) <= 0 || len(val) <= 0 {
 		return nil
 	}
-	return s.db.Set(context.Background(), key, val, exp).Err()
+	return s.db.Set(context.Background(), s.composeKey(key), val, exp).Err()
 }
 
 // Delete key by key
@@ -96,7 +97,7 @@ func (s *Storage) Delete(key string) error {
 	if len(key) <= 0 {
 		return nil
 	}
-	return s.db.Del(context.Background(), key).Err()
+	return s.db.Del(context.Background(), s.composeKey(key)).Err()
 }
 
 // Reset all keys
@@ -112,4 +113,11 @@ func (s *Storage) Close() error {
 // Return database client
 func (s *Storage) Conn() redis.UniversalClient {
 	return s.db
+}
+
+func (s *Storage) composeKey(key string) string {
+	if s.prefix != "" {
+		return s.prefix + ":" + key
+	}
+	return key
 }

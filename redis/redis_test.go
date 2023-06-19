@@ -9,7 +9,7 @@ import (
 	"github.com/gofiber/utils"
 )
 
-var testStore = New(Config{
+var testStore, _ = New(Config{
 	Reset: true,
 })
 
@@ -128,7 +128,7 @@ func Test_Redis_Conn(t *testing.T) {
 }
 
 func Test_Redis_Initalize_WithURL(t *testing.T) {
-	testStoreUrl := New(Config{
+	testStoreUrl, _ := New(Config{
 		URL: "redis://localhost:6379",
 	})
 	var (
@@ -169,7 +169,7 @@ func Test_Redis_Initalize_WithURL_TLS(t *testing.T) {
 		},
 	}
 
-	testStoreUrl := New(Config{
+	testStoreUrl, _ := New(Config{
 		URL:       "redis://localhost:6380",
 		TLSConfig: tlsCfg,
 	})
@@ -194,7 +194,7 @@ func Test_Redis_Initalize_WithURL_TLS(t *testing.T) {
 
 func Test_Redis_Universal_Addrs(t *testing.T) {
 	// This should failover and create a Single Node connection.
-	testStoreUniversal := New(Config{
+	testStoreUniversal, _ := New(Config{
 		Addrs: []string{"localhost:6379"},
 	})
 
@@ -219,7 +219,7 @@ func Test_Redis_Universal_Addrs(t *testing.T) {
 func Test_Redis_Universal_With_URL_Undefined(t *testing.T) {
 	// This should failover to creating a regular *redis.Client
 	// The URL should get ignored since it's empty
-	testStoreUniversal := New(Config{
+	testStoreUniversal, _ := New(Config{
 		URL:   "",
 		Addrs: []string{"localhost:6379"},
 	})
@@ -245,7 +245,7 @@ func Test_Redis_Universal_With_URL_Undefined(t *testing.T) {
 func Test_Redis_Universal_With_URL_Defined(t *testing.T) {
 	// This should failover to creating a regular *redis.Client
 	// The Addrs field should get ignored since URL is defined
-	testStoreUniversal := New(Config{
+	testStoreUniversal, _ := New(Config{
 		URL:   "redis://localhost:6379",
 		Addrs: []string{"localhost:6355"},
 	})
@@ -271,7 +271,7 @@ func Test_Redis_Universal_With_URL_Defined(t *testing.T) {
 func Test_Redis_Universal_With_HostPort(t *testing.T) {
 	// This should failover to creating a regular *redis.Client
 	// The Host and Port should get ignored since Addrs is defined
-	testStoreUniversal := New(Config{
+	testStoreUniversal, _ := New(Config{
 		Host:  "localhost",
 		Port:  6388,
 		Addrs: []string{"localhost:6379"},
@@ -298,7 +298,7 @@ func Test_Redis_Universal_With_HostPort(t *testing.T) {
 func Test_Redis_Universal_With_HostPort_And_URL(t *testing.T) {
 	// This should failover to creating a regular *redis.Client
 	// The Host and Port should get ignored since Addrs is defined
-	testStoreUniversal := New(Config{
+	testStoreUniversal, _ := New(Config{
 		URL:   "redis://localhost:6379",
 		Host:  "localhost",
 		Port:  6388,
@@ -324,7 +324,7 @@ func Test_Redis_Universal_With_HostPort_And_URL(t *testing.T) {
 }
 
 func Test_Redis_Cluster(t *testing.T) {
-	testStoreUniversal := New(Config{
+	testStoreUniversal, _ := New(Config{
 		Addrs: []string{
 			"localhost:7000",
 			"localhost:7001",
